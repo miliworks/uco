@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<!-- saved from url=(0037)http://www.riaidea.com/html5/dolphin/ -->
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<meta name="viewport" content="user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="apple-touch-fullscreen" content="yes">
+<title>海豚戏珠</title>
+
+<style type="text/css">
+body, div, canvas
+{
+    image-rendering: optimizeSpeed;
+    -webkit-image-rendering: optimizeSpeed;
+    -webkit-interpolation-mode: nearest-neighbor;
+}
+
+body{padding:0; margin:0;font-size:12px;background-color:#000;}
+body, html{height: 100%;}
+#outer{height:100%; overflow:hidden; position:relative; width:100%;}
+#outer[id]{display:table; position:static;}
+#middle{position:absolute; top:50%;} /* for ie only*/
+#middle[id]{display:table-cell; vertical-align:middle; position:static;}
+</style>
+
+<!--
+<script type="text/javascript" src="quark/core/base.js"></script>
+<script type="text/javascript" src="quark/event/EventDispatcher.js"></script>
+<script type="text/javascript" src="quark/event/EventManager.js"></script>
+<script type="text/javascript" src="quark/event/EventConst.js"></script>
+<script type="text/javascript" src="quark/geom/Matrix.js"></script>
+<script type="text/javascript" src="quark/geom/Rectangle.js"></script>
+<script type="text/javascript" src="quark/utils/Utils.js"></script>
+<script type="text/javascript" src="quark/utils/Timer.js"></script>
+<script type="text/javascript" src="quark/utils/Tween.js"></script>
+<script type="text/javascript" src="quark/utils/UIDUtil.js"></script>
+<script type="text/javascript" src="quark/utils/ImageLoader.js"></script>
+<script type="text/javascript" src="quark/context/Context.js"></script>
+<script type="text/javascript" src="quark/context/CanvasContext.js"></script>
+<script type="text/javascript" src="quark/context/DOMContext.js"></script>
+<script type="text/javascript" src="quark/display/Drawable.js"></script>
+<script type="text/javascript" src="quark/display/DisplayObject.js"></script>
+<script type="text/javascript" src="quark/display/DisplayObjectContainer.js"></script>
+<script type="text/javascript" src="quark/display/Stage.js"></script>
+<script type="text/javascript" src="quark/display/Bitmap.js"></script>
+<script type="text/javascript" src="quark/display/MovieClip.js"></script>
+-->
+
+<script type="text/javascript" src="js/quark.base-1.0.0.alpha.min.js"></script>
+<script type="text/javascript" src="js/Audio.js"></script>
+<script type="text/javascript" src="js/Orientation.js"></script>
+<script type="text/javascript" src="js/Button.js"></script>
+<script type="text/javascript" src="js/main.js"></script>
+<script type="text/javascript" src="js/Ball.js"></script>
+<script type="text/javascript" src="js/Dolphin.js"></script>
+<script type="text/javascript" src="js/Num.js"></script>
+
+</head>
+
+<body>
+
+<div id="outer">
+	<div id="middle">
+		<div id="container" style="position: relative; top: -50%; width: 980px; height: 545px; margin: 0px auto; overflow: hidden; background-image: -webkit-gradient(linear, 0 0, 0 100%, from(rgb(0, 194, 235)), to(rgb(203, 254, 255))); background-position: initial initial; background-repeat: initial initial;">
+		</div>
+	</div>
+</div>
+
+<div id="fps" style="position:absolute;top:0;left:0;color:#fff;"></div>
+
+</body></html>

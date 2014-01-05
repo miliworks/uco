@@ -21,6 +21,7 @@ var game =
     {id:"loading", size:77, src:"images/loading.jpg"},
 	{id:"notice", size:186, src:"images/notice.jpg"},
 	{id:"progress", size:411, src:"images/progress.png"},
+    {id:"progress_mask", size:411, src:"images/progress_mask.png"},
 	{id:"progress_bg", size:411, src:"images/progress_bg.png"},
     {id:"top", size:85, src:"images/top.jpg"}
 	],
@@ -38,9 +39,12 @@ var game =
 	
 	girl: null,
     gifts: [],
+    gametime: 0, // 当前游戏进行时长
+    movetime: 0, // 等待移动
 
     // 全局参数
-	time: {total:30, current:30}, // 每局时长
+	GAMETIME_TOTAL: 30, // 每局时长
+    MOVETIME_TOTAL: 5, // 多久角色移动一次
     GIFT_NUM: 3, // 奖品总数
     GIFT_WIDTH: 34, //
 
@@ -223,6 +227,8 @@ game.showMain = function()
 	var me = this;
 	//设置当前状态
 	this.state = STATE.MAIN;
+    this.movetime = 0;
+    this.gametime = 0;
 
     //背景
 	if(this.bg == null)
@@ -234,6 +240,13 @@ game.showMain = function()
     this.bg.y = 0;
     this.bg.width = this.width;
     this.bg.height = this.height;
+
+    // 进度bar
+    if(this.progressbar == null )
+    {
+        var progressbar = new ns.ProgressBar({id:"progressbar"});
+        this.progressbar = progressbar;
+    }
 
     // 奖品bar
     if(this.giftbar == null )
@@ -250,15 +263,28 @@ game.showMain = function()
     }
 
 
-    //每隔一段时间重新调整avatar位置
+    //每s游戏逻辑更新
     var delay = function()
     {
         me.timer.delay(function()
         {
-            game.avatar.move();
+            // 角色移动
+            game.movetime++;
+            if( game.movetime >= game.MOVETIME_TOTAL-1 )
+            {
+                game.avatar.move();
+                game.movetime = 0;
+            }
 
-            delay();
-        }, 10000);
+            // 游戏时间
+            game.gametime++;
+            game.progressbar.setProgress(Math.floor(game.gametime/game.GAMETIME_TOTAL*100));
+
+            if( game.gametime >= game.GAMETIME_TOTAL )
+                game.gameOver();
+            else
+                delay();
+        }, 1000);
     }
     delay();
 	
@@ -266,7 +292,7 @@ game.showMain = function()
 	this.avatar.move();
 	
 	//添加所有对象到舞台
-	this.stage.addChild(this.bg, this.giftbar, this.avatar);
+	this.stage.addChild(this.bg, this.progressbar, this.giftbar, this.avatar);
 	
 	//显示倒计时
 	//this.showTimer();
@@ -346,114 +372,6 @@ game.checkCollision = function()
 	return false;
 }
 
-//得分
-game.addScore = function(ball, score)
-{
-	if(this.addNum == null)
-	{
-		var container = new Q.DisplayObjectContainer({id:"addNum", width:100, height:65});
-		var plus = new ns.Num({id:"plus", type:ns.Num.Type.num1});
-		plus.setValue(11);
-		container.addChild(plus);
-		var num = new ns.Num({id:"num", type:ns.Num.Type.num1});
-		num.x = plus.x + plus.width - 15;
-		container.addChild(num);
-		this.addNum = container;
-	}	
-	this.stage.addChild(this.addNum);
-	this.addNum.getChildAt(1).setValue(score);
-	this.addNum.x = ball.x - 50;
-	this.addNum.y = ball.y - 100;
-	this.addNum.alpha = 1;
-	
-	this.score += score;
-	this.updateScore();
-	
-	Q.Tween.to(this.addNum, {y:this.addNum.y-100, alpha:0}, {time:1000});
-}
-
-//更新总得分
-game.updateScore = function()
-{
-	if(this.scoreNum == null)
-	{
-		var container = new Q.DisplayObjectContainer({id:'score', width:200, height:65});
-		var num0 = new ns.Num({id:"num0", type:ns.Num.Type.num2});
-		var num1 = new ns.Num({id:"num1", type:ns.Num.Type.num2});
-		var num2 = new ns.Num({id:"num2", type:ns.Num.Type.num2});
-		var num3 = new ns.Num({id:"num3", type:ns.Num.Type.num2});
-		num1.x = 50;
-		num2.x = 100;
-		num3.x = 150;
-		container.addChild(num0, num1, num2, num3);
-		container.scaleX = container.scaleY = 0.8;
-		container.x = this.width - container.getCurrentWidth() - 15 >> 0;
-		container.y = 15;
-		this.scoreNum = container;
-	}	
-	this.stage.addChild(this.scoreNum);
-	
-	var str = this.score.toString(), len = str.length;
-	str = len > 4 ? str.slice(len - 4) : str;
-	while(str.length < 4) str = "0" + str;
-	for(var i = 0; i < str.length; i++)
-	{
-		this.scoreNum.getChildAt(i).setValue(Number(str[i]));
-	}
-}
-
-//显示倒计时
-game.showTimer = function()
-{	
-	if(this.countdown == null)
-	{
-		//初始化倒计时
-		var countdown = new Q.DisplayObjectContainer({id:'countdown', width:250, height:65});
-		var num1 = new ns.Num({id:"min1", type:ns.Num.Type.num2});
-		var num2 = new ns.Num({id:"min2", type:ns.Num.Type.num2});
-		var sep = new ns.Num({id:"sep", type:ns.Num.Type.num2});
-		var sec1 = new ns.Num({id:"sec1", type:ns.Num.Type.num2});
-		var sec2 = new ns.Num({id:"sec2", type:ns.Num.Type.num2});
-		num2.x = 45;
-		sep.x = 80;
-		sec1.x = 125;
-		sec2.x = 170;
-		sep.setValue(10);
-		countdown.addChild(num1, num2, sep, sec1, sec2);
-		countdown.scaleX = countdown.scaleY = 0.8;
-		countdown.x = 90;
-		countdown.y = 15;
-		this.countdown = countdown;
-	}	
-	this.stage.addChild(this.countdown);
-	this.time.current = this.time.total;
-	this.updateTimer();
-	
-	//启动倒计时Tween
-	Q.Tween.to(this.time, null, {time:1000, loop:true, 
-	onComplete:function(tween)
-	{
-		game.updateTimer();
-		if(game.time.current <= -1)
-		{
-			tween.stop();
-			game.gameOver();
-		}
-	}});
-}
-
-//更新倒计时数值
-game.updateTimer = function()
-{	
-	var me = this, time = this.time;
-	var min = Math.floor(time.current / 60), sec = time.current % 60;
-	me.countdown.getChildAt(0).setValue(min>=10?Math.floor(min/10) : 0);
-	me.countdown.getChildAt(1).setValue(min>=10?(min%10) : min);
-	me.countdown.getChildAt(3).setValue(sec>=10?Math.floor(sec/10) : 0);
-	me.countdown.getChildAt(4).setValue(sec>=10?(sec%10) : sec);
-	time.current--;
-}
-
 //游戏结束
 game.gameOver = function()
 {
@@ -473,6 +391,10 @@ game.gameOver = function()
 //		}
 //		this.container.appendChild(this.overlay);
 
+    var txt = new Q.Text({font: Q.isMobile ?  'bold 48px 黑体' : 'bold 48px 宋体', color: "#000", textShadow: Q.isAndroid ? "0 2px 2px #111" : "0 2px 2px #ccc", text:"游戏结束", width:game.width, height:100, lineWidth:game.width, lineSpacing:0, textAlign:"center"});
+    txt.x = 0;
+    txt.y = (game.height-100)/2;
+    game.stage.addChild(txt);
 	
 	this.state = STATE.OVER;
 	this.stage.step();

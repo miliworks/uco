@@ -21,7 +21,6 @@ var game =
     {id:"loading", size:77, src:"images/loading.jpg"},
 	{id:"notice", size:186, src:"images/notice.jpg"},
 	{id:"progress", size:411, src:"images/progress.png"},
-    {id:"progress_mask", size:411, src:"images/progress_mask.png"},
 	{id:"progress_bg", size:411, src:"images/progress_bg.png"},
     {id:"top", size:85, src:"images/top.jpg"}
 	],

@@ -71,6 +71,7 @@ Audio.prototype._evtHandler = function(e)
 		this.dispatchEvent({type:"ended", target:this});
 		if(this.loop) this.play();
 		else this._playing = false;
+        this._loaded = true;
 	}else if(e.type == "error")
 	{
 		throw "Quark.Audio Error: " + e.target.src;

@@ -31,12 +31,7 @@ ProgressBar.prototype.init = function()
     fv.height = this.height;
     this.progress = fv;
 
-    var fvMask = new Q.Graphics({width:1, height:this.height, x:0, y:0});
-    fvMask.drawRect(0,0,1,this.height).beginFill("#000").endFill();
-    fv.mask = fvMask;
-
     this.addChild(bg,fv);
-    //this.addChild(fvMask);
 };
 
 ProgressBar.prototype.setProgress = function(percent)
@@ -44,8 +39,7 @@ ProgressBar.prototype.setProgress = function(percent)
     // 调整mask宽度
     var width = this.width * percent / 100;
     trace("progress:", percent);
-    this.progress.mask.width = width;
-    this.progress.mask.drawRect(0,0,width,this.height).beginFill("#000").endFill();
+    this.progress.width = width;
 };
 
 })();

@@ -5,6 +5,11 @@ window.onload = function()
 {
 	game.init();
 };
+
+window.onresize = function()
+{
+    //game.resize();
+}
 	
 var game = 
 {
@@ -33,8 +38,13 @@ var game =
 	
 	girl: null,
     gifts: [],
-	
-	time: {total:30, current:30}
+
+    // 全局参数
+	time: {total:30, current:30}, // 每局时长
+    GIFT_NUM: 3, // 奖品总数
+    GIFT_WIDTH: 34, //
+
+    dummy:null
 };
 
 var STATE = 
@@ -60,14 +70,6 @@ game.init = function()
 
 	//加载进度信息
 	var div = document.createElement("div");
-//	div.style.position = "absolute";
-//	div.style.width = container.clientWidth + "px";
-//	div.style.left = "0px";
-//	div.style.top = (container.clientHeight >> 1) + "px";
-//	div.style.textAlign = "center";
-//	div.style.color = "#fff";
-//	div.style.font = Q.isMobile ?  'bold 16px 黑体' : 'bold 16px 宋体';
-//	div.style.textShadow = Q.isAndroid ? "0 2px 2px #111" : "0 2px 2px #ccc";
     var img = document.createElement("img");
     img.src = "images/loading.jpg";
     img.width = this.width;
@@ -85,6 +87,7 @@ game.init = function()
             game.hideNavBar();
             game.calcStagePosition();
         };
+
     }    
 	
     //加载图片素材
@@ -98,7 +101,7 @@ game.init = function()
 game.onLoadLoaded = function(e)
 {
 
-}
+};
 
 //加载完成
 game.onLoadComplete = function(e)
@@ -111,13 +114,13 @@ game.onLoadComplete = function(e)
 
 	//启动游戏
 	this.startup();
-}
+};
 
 //获取图片资源
 game.getImage = function(id)
 {
 	return this.images[id].image;
-}
+};
 
 //启动游戏
 game.startup = function()
@@ -194,6 +197,10 @@ game.startup = function()
                 if( obj.id == 'avatar' )
                 {
                     // avatar被点击
+                    game.audio.play();
+
+                    game.addGift(0);
+
 				    game.avatar.move();
                 }
 			}
@@ -217,45 +224,88 @@ game.showMain = function()
 	//设置当前状态
 	this.state = STATE.MAIN;
 
+    //背景
 	if(this.bg == null)
 	{
-		//背景
 		var bg = new Q.Bitmap({id:"bg", image:this.getImage("bg")});
-		bg.x = 0;
-        bg.y = 0;
-        bg.width = this.width;
-        bg.height = this.height;
-		this.bg = bg;
+        this.bg = bg;
+    }
+    this.bg.x = 0;
+    this.bg.y = 0;
+    this.bg.width = this.width;
+    this.bg.height = this.height;
 
-		//创建海豚
-		var avatar = new ns.Avatar({id:"avatar"});
-		this.avatar = avatar;
+    // 奖品bar
+    if(this.giftbar == null )
+    {
+        var giftbar = new ns.GiftBar({id:"giftbar"});
+        this.giftbar = giftbar;
+    }
 
-		//每隔一段时间重新调整avatar位置
-		var delay = function()
-		{
-			me.timer.delay(function()
-			{
-                game.avatar.move();
+    //创建avatar
+    if(this.avatar == null )
+    {
+        var avatar = new ns.Avatar({id:"avatar"});
+        this.avatar = avatar;
+    }
 
-				delay();
-			}, 10000);
-		}
-		delay();
 
-	}
+    //每隔一段时间重新调整avatar位置
+    var delay = function()
+    {
+        me.timer.delay(function()
+        {
+            game.avatar.move();
+
+            delay();
+        }, 10000);
+    }
+    delay();
 	
 	//初始化avatar
 	this.avatar.move();
 	
 	//添加所有对象到舞台
-	this.stage.addChild(this.bg, this.avatar);
+	this.stage.addChild(this.bg, this.giftbar, this.avatar);
 	
 	//显示倒计时
 	//this.showTimer();
 	//显示得分
 	//this.updateScore();
+};
+
+game.addGift = function(type)
+{
+    var giftid = Math.floor(Math.random() * game.GIFT_NUM);
+    var gift = new Q.Bitmap({id:"gift", image:game.getImage("gift"), rect:[giftid*game.GIFT_WIDTH,0,game.GIFT_WIDTH,game.GIFT_WIDTH]});
+
+    this.giftbar.addGift(gift);
 }
+
+game.resize = function()
+{
+    this.container = Q.getDOM("container");
+    this.width = this.container.clientWidth;
+    this.height = this.container.clientHeight;
+
+    if(this.bg != null)
+    {
+        this.bg.width = this.width;
+        this.bg.height = this.height;
+    }
+
+    if( this.stage != null )
+    {
+        this.stage.width = this.width;
+        this.stage.height = this.height;
+    }
+
+    if( this.context != null )
+    {
+        this.context.width = this.width;
+        this.context.height = this.height;
+    }
+};
 
 //主更新方法
 game.update = function(timeInfo)

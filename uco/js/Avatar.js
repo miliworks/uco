@@ -31,8 +31,8 @@ Avatar.prototype.init = function()
 
 Avatar.prototype.move = function()
 {
-    this.x = Math.random()*game.width;
-    this.y = Math.random()*game.height;
+    this.x = Math.random()*(game.width-this.avatar.width)+this.avatar.width/2;
+    this.y = Math.random()*(game.height-this.avatar.height-game.giftbar.height)+this.avatar.height/2;
 
     this.avatar.gotoAndStop("idle");
 }
